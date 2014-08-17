@@ -1,0 +1,23 @@
+<div class="pageform_element">
+[if:content:title == ]
+[if:content:content != ]
+	<p>[rewrite:content]content[/rewrite]</p>
+[/if]
+	[block:content:table]output.Table.render[/block]
+[if:content:error_message != ]
+	<p class="pageform_error">[rewrite:content]error_message[/rewrite]</p>
+[/if]
+[/if]
+[if:content:title != ]
+	<span class="pageform_label"><strong>[rewrite:content]title[/rewrite]</strong>:</span>
+	<div class="pageform_field">
+[if:content:content != ]
+		<p>[rewrite:content]content[/rewrite]</p>
+[/if]
+		[block:content:table]output.Table.render[/block]
+[if:content:error_message != ]
+		<p class="pageform_error">[rewrite:content]error_message[/rewrite]</p>
+[/if]
+	</div>
+[/if]
+</div>
