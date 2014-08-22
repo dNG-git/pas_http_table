@@ -1,5 +1,5 @@
 <script type="text/javascript"><![CDATA[
 require([ "djs/ResponsiveTable.min" ], function(ResponsiveTable) {
-	ResponsiveTable.init({ id: "[rewrite:content]table_id[/rewrite]" });
+	new ResponsiveTable({ id: "[rewrite:content]table_id[/rewrite]" });
 });
 ]]></script>
