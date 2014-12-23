@@ -22,7 +22,7 @@ from dNG.pas.data.xhtml.formatting import Formatting
 from .abstract_field import AbstractField
 from .read_only_field_mixin import ReadOnlyFieldMixin
 
-class InfoTableField(AbstractField, ReadOnlyFieldMixin):
+class InfoTableField(ReadOnlyFieldMixin, AbstractField):
 #
 	"""
 "InfoTableField" provides a table for the field content.
@@ -91,7 +91,7 @@ Renders the given field.
 		context = { "title": Formatting.escape(self.get_title()),
 		            "content": self._get_content(),
 		            "table": { "table": self.table },
-		            "error_message": ("" if (self.error_data == None) else Formatting.escape(self.get_error_message()))
+		            "error_message": ("" if (self.error_data is None) else Formatting.escape(self.get_error_message()))
 		          }
 
 		return self._render_oset_file("table/form/info_table", context)

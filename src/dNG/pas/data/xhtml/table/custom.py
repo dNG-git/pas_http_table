@@ -79,69 +79,6 @@ Adds row data to this table.
 		self.rows.append(CustomRow(kwargs))
 	#
 
-	def disable_sort(self, *args):
-	#
-		"""
-Disables sorting for the specified rows.
-
-:since: v0.1.00
-		"""
-
-		for key in args:
-		#
-			if (key not in self.column_definitions): raise ValueException("Given row key is not specified")
-			self.column_definitions[key]['sortable'] = False
-		#
-	#
-
-	def get_column_definitions(self):
-	#
-		"""
-Returns a dict of all column definitions.
-
-:return: (dict) Column definitions
-:since:  v0.1.00
-		"""
-
-		return self.column_definitions
-	#
-
-	def get_columns(self):
-	#
-		"""
-Returns a list of all column keys.
-
-:return: (list) Column keys
-:since:  v0.1.00
-		"""
-
-		return self.columns
-	#
-
-	def get_limit(self):
-	#
-		"""
-Returns the limit of rows requested.
-
-:return: (int) Maximum number of rows requested; -1 for unlimited
-:since:  v0.1.00
-		"""
-
-		return self.limit
-	#
-
-	def get_percent_remaining(self):
-	#
-		"""
-Returns the percent remaining to be at 100%.
-
-:return: (int) Percent value
-:since:  v0.1.00
-		"""
-
-		return self.percent_remaining
-	#
-
 	def get_row_count(self):
 	#
 		"""
@@ -151,34 +88,8 @@ Returns the number of rows.
 :since:  v0.1.00
 		"""
 
-		if (self.row_count == None): self.row_count = len(self.rows)
+		if (self.row_count is None): self.row_count = len(self.rows)
 		return self.row_count
-	#
-
-	def set_limit(self, limit):
-	#
-		"""
-Sets the limit of rows requested.
-
-:param limit: Maximum number of rows requested; -1 for unlimited
-
-:since: v0.1.00
-		"""
-
-		self.limit = limit
-	#
-
-	def set_offset(self, offset):
-	#
-		"""
-Sets the row offset requested.
-
-:param offset: Row offset requested
-
-:since: v0.1.00
-		"""
-
-		self.offset = offset
 	#
 
 	def set_row_count(self, row_count):

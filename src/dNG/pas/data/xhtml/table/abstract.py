@@ -21,6 +21,7 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 from dNG.pas.data.supports_mixin import SupportsMixin
 from dNG.pas.runtime.iterator import Iterator
 from dNG.pas.runtime.not_implemented_exception import NotImplementedException
+from dNG.pas.runtime.type_exception import TypeException
 from dNG.pas.runtime.value_exception import ValueException
 
 class Abstract(Iterator, SupportsMixin):
@@ -38,6 +39,10 @@ It is used as an iterator to read rows.
              Mozilla Public License, v. 2.0
 	"""
 
+	COLUMN_RENDERER_CALLBACK = 3
+	"""
+Uses a defined callback to encode the specified column data
+	"""
 	COLUMN_RENDERER_OSET = 1
 	"""
 Uses "template_name" to render the OSet with the specified column data
@@ -45,6 +50,14 @@ Uses "template_name" to render the OSet with the specified column data
 	COLUMN_RENDERER_SAFE_CONTENT = 2
 	"""
 Encodes the specified column data to be shown as XHTML content
+	"""
+	SORT_ASCENDING = "+"
+	"""
+Ascending sort direction
+	"""
+	SORT_DESCENDING = "-"
+	"""
+Descending sort direction
 	"""
 
 	def __init__(self):
@@ -65,21 +78,33 @@ Column definitions
 		"""
 List of columns
 		"""
+		self.default_sort_definition = None
+		"""
+Default sort definition to be used
+		"""
 		self.hide_column_titles = False
 		"""
 True to hide column titles
-		"""
-		self.offset = 0
-		"""
-Row offset requested
 		"""
 		self.limit = -1
 		"""
 Limit of rows requested
 		"""
+		self.offset = 0
+		"""
+Row offset requested
+		"""
 		self.percent_remaining = 100
 		"""
 Percent remaining for additional columns
+		"""
+		self.sort_context = None
+		"""
+Sort context to be used
+		"""
+		self.sort_list = [ ]
+		"""
+Sort list to be applied
 		"""
 	#
 
@@ -113,16 +138,33 @@ Add a column with the given properties.
 
 		if (key not in self.column_definitions): self.columns.append(key)
 
-		if (renderer == None): renderer = { "type": Abstract.COLUMN_RENDERER_SAFE_CONTENT }
-		if (sort_key == None): sort_key = key
+		if (renderer is None): renderer = { "type": Abstract.COLUMN_RENDERER_SAFE_CONTENT }
+		if (sort_key is None): sort_key = key
 
 		self.column_definitions[key] = { "key": key,
 		                                 "title": title,
 		                                 "size": size,
 		                                 "sort_key": sort_key,
-		                                 "sortable": True,
+		                                 "sortable": self.is_supported("sorting"),
 		                                 "renderer": renderer
 		                               }
+	#
+
+	def add_sort_definition(self, key, direction):
+	#
+		"""
+Adds a sort definition.
+
+:param key: Row key to sort
+:param direction: Sort direction
+
+:since: v0.1.02
+		"""
+
+		if (key not in self.column_definitions): raise ValueException("Given row key is not specified")
+		if (direction not in ( Abstract.SORT_ASCENDING, Abstract.SORT_DESCENDING )): raise TypeException("Sort direction given is invalid")
+
+		self.sort_list.append({ "key": key, "direction": direction })
 	#
 
 	def disable_sort(self, *args):
@@ -200,6 +242,23 @@ Returns the number of rows.
 		raise NotImplementedException()
 	#
 
+	def set_default_sort_definition(self, key, direction):
+	#
+		"""
+Sets the default sort definition to be used.
+
+:param key: Row key to sort
+:param direction: Sort direction
+
+:since: v0.1.02
+		"""
+
+		if (key not in self.column_definitions): raise ValueException("Given row key is not specified")
+		if (direction not in ( Abstract.SORT_ASCENDING, Abstract.SORT_DESCENDING )): raise TypeException("Sort direction given is invalid")
+
+		self.default_sort_definition = { "key": key, "direction": direction }
+	#
+
 	def set_limit(self, limit):
 	#
 		"""
@@ -224,6 +283,19 @@ Sets the row offset requested.
 		"""
 
 		self.offset = offset
+	#
+
+	def set_sort_context(self, context):
+	#
+		"""
+Sets the sort context to be used.
+
+:param context: Sort context
+
+:since: v0.1.00
+		"""
+
+		self.sort_context = context
 	#
 #
 

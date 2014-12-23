@@ -27,8 +27,10 @@ from dNG.pas.data.binary import Binary
 from dNG.pas.data.http.translatable_exception import TranslatableException
 from dNG.pas.data.xhtml.formatting import Formatting as XHtmlFormatting
 from dNG.pas.data.xhtml.page_links_renderer import PageLinksRenderer
+from dNG.pas.data.xhtml.link import Link
 from dNG.pas.data.xhtml.oset.file_parser import FileParser
 from dNG.pas.data.xhtml.table.abstract import Abstract
+from dNG.pas.runtime.type_exception import TypeException
 from .module import Module
 
 class Table(Module):
@@ -59,6 +61,10 @@ Constructor __init__(Table)
 		"""
 DSD key used for pagination
 		"""
+		self.dsd_sort_key = "sort"
+		"""
+DSD key used for sorting
+		"""
 		self.page = 1
 		"""
 Page currently rendered
@@ -70,6 +76,14 @@ Rendered page link cell
 		self.pages = 1
 		"""
 Total number of pages available
+		"""
+		self.sort_direction = None
+		"""
+Direction of the current sort value
+		"""
+		self.sort_row_key = ""
+		"""
+Row key of the current sort value
 		"""
 		self.table = None
 		"""
@@ -105,14 +119,14 @@ Action for "render_subs"
 		"""
 
 		table = self.context.get("table")
-
-		if (not isinstance(table, Abstract)): raise TranslatableException("core_unknown_error", "Missing table instance to render")
+		if (not isinstance(table, Abstract)): raise TranslatableException("core_unknown_error", value = "Missing table instance to render")
 
 		if ("dsd_page_key" in self.context): self.dsd_page_key = self.context['dsd_page_key']
+		if ("dsd_sort_key" in self.context): self.dsd_sort_key = self.context['dsd_sort_key']
 		self.table = table
 
 		table_id = self.context.get("id")
-		self.table_id = ("pas_table_{0}".format(Binary.str(hexlify(urandom(10)))) if (table_id == None) else table_id)
+		self.table_id = ("pas_table_{0}".format(Binary.str(hexlify(urandom(10)))) if (table_id is None) else table_id)
 
 		limit = self.table.get_limit()
 		row_count = self.table.get_row_count()
@@ -122,11 +136,38 @@ Action for "render_subs"
 
 		self.table.set_offset(0 if (self.page < 1 or self.page > self.pages) else (self.page - 1) * limit)
 
+		sort_value = self.context.get("sort_value", "")
+
+		if (sort_value != ""):
+		#
+			self.sort_direction = sort_value[-1:]
+			self.sort_row_key = sort_value[:-1]
+
+			self.table.add_sort_definition(self.sort_row_key, self.sort_direction)
+		#
+
 		rendered_content = self._render_table_header()
 		rendered_content += self._render_table_rows()
 		rendered_content += self._render_table_footer()
 
 		self.set_action_result(rendered_content)
+	#
+
+	def _get_sort_value(self, row_key):
+	#
+		"""
+Returns the value used to sort the row based on the current one.
+
+:return: (str) Sort value
+:since:  v0.1.02
+		"""
+
+		_return = ""
+
+		if (self.sort_row_key != row_key): _return = "{0}+".format(row_key)
+		elif (self.sort_direction == "+"): _return = "{0}-".format(row_key)
+
+		return _return
 	#
 
 	def _render_table_cell(self, row, column_definition):
@@ -146,22 +187,31 @@ Renders the table cell based on the given column definition.
 
 		_return = "<td></td>"
 
+		callback = None
+
 		td_attributes = { "tag": "td" }
-		if (css_text_align_definition != None): td_attributes['attributes'] = { "style": css_text_align_definition }
+		if (css_text_align_definition is not None): td_attributes['attributes'] = { "style": css_text_align_definition }
 
 		column_type = column_definition['renderer'].get("type")
 
-		if (column_type == Abstract.COLUMN_RENDERER_SAFE_CONTENT):
+		if (column_type == Abstract.COLUMN_RENDERER_CALLBACK):
+		#
+			if (column_definition['renderer'].get("callback") is None): raise TypeException("Table column renderer callback is invalid")
+			callback = column_definition['renderer']['callback']
+		#
+		elif (column_type == Abstract.COLUMN_RENDERER_SAFE_CONTENT):
 		#
 			row_data = row[column_definition['key']]
 			td_attributes['value'] = XHtmlFormatting.escape("{0}".format(row_data))
 
 			_return = XmlParser().dict_to_xml_item_encoder(td_attributes)
 		#
-		elif (column_type == Abstract.COLUMN_RENDERER_OSET):
+		elif (column_type == Abstract.COLUMN_RENDERER_OSET): callback = self._execute_cell_oset_renderer
+
+		if (callback is not None):
 		#
 			_return = "{0}{1}</td>".format(XmlParser().dict_to_xml_item_encoder(td_attributes, False),
-			                               self._execute_cell_oset_renderer(row, column_definition)
+			                               callback(row, column_definition)
 			                              )
 		#
 
@@ -177,7 +227,7 @@ Renders the table page navigation if applicable and footer.
 :since:  v0.1.00
 		"""
 
-		page_link_cell = ("" if (self.page_link_cell == None) else "\n<tfoot>{0}</tfoot>".format(self.page_link_cell))
+		page_link_cell = ("" if (self.page_link_cell is None) else "\n<tfoot><tr>{0}</tr></tfoot>".format(self.page_link_cell))
 
 		_return = "{0}\n</table>".format(page_link_cell)
 
@@ -210,7 +260,11 @@ Renders the table header and page navigation if applicable.
 		                                   }
 		                   }
 
-		_return = "{0}\n<thead>".format(xml_parser.dict_to_xml_item_encoder(table_attributes, False))
+		thead_tr_attributes = { "tag": "tr", "attributes": { "class": "pagetable_header_row" } }
+
+		_return = "{0}\n<thead>{1}".format(xml_parser.dict_to_xml_item_encoder(table_attributes, False),
+		                                   xml_parser.dict_to_xml_item_encoder(thead_tr_attributes, False),
+		                                  )
 
 		column_definitions = self.table.get_column_definitions()
 
@@ -226,7 +280,6 @@ Renders the table header and page navigation if applicable.
 			css_text_align_definition = ("" if (css_text_align_value == "left") else "; text-align: {0}".format(css_text_align_value))
 
 			th_attributes = { "tag": "th",
-			                  "value": XHtmlFormatting.escape(column_definition['title']),
 			                  "attributes": { "style": "width: {0:d}%{1}".format(column_definition['size']
 			                                                                     + column_percent_addition
 			                                                                     + first_column_percent_addition,
@@ -235,7 +288,27 @@ Renders the table header and page navigation if applicable.
 			                                }
 			                }
 
-			_return += xml_parser.dict_to_xml_item_encoder(th_attributes)
+			_return += xml_parser.dict_to_xml_item_encoder(th_attributes, False)
+
+			if (column_definition['sortable']):
+			#
+				sort_value = self._get_sort_value(column_definition['key'])
+
+				link = Link().build_url(Link.TYPE_RELATIVE_URL,
+				                        { "__request__": True,
+				                          "dsd": { self.dsd_page_key: 1,
+				                                   self.dsd_sort_key: sort_value
+				                                 }
+				                        }
+				                       )
+
+				link_attributes = { "tag": "a", "attributes": { "href": link }, "value": column_definition['title'] }
+
+				_return += XmlParser().dict_to_xml_item_encoder(link_attributes)
+			#
+			else: _return += XHtmlFormatting.escape(column_definition['title'])
+
+			_return += "</th>"
 
 			if (first_column_percent_addition > 0): first_column_percent_addition = 0
 		#
@@ -258,10 +331,10 @@ Renders the table header and page navigation if applicable.
 			                                                   rendered_links
 			                                                  )
 
-			_return += "\n<tr>{0}</tr>".format(self.page_link_cell)
+			_return += "</tr>\n<tr>{0}".format(self.page_link_cell)
 		#
 
-		_return += "</thead>"
+		_return += "</tr></thead>"
 
 		return _return
 	#
