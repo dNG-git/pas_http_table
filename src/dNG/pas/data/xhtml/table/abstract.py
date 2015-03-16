@@ -164,7 +164,9 @@ Adds a sort definition.
 		if (key not in self.column_definitions): raise ValueException("Given row key is not specified")
 		if (direction not in ( Abstract.SORT_ASCENDING, Abstract.SORT_DESCENDING )): raise TypeException("Sort direction given is invalid")
 
-		self.sort_list.append({ "key": key, "direction": direction })
+		self.sort_list.append({ "key": self.column_definitions[key]['sort_key'],
+		                        "direction": direction
+		                      })
 	#
 
 	def disable_sort(self, *args):
@@ -256,7 +258,9 @@ Sets the default sort definition to be used.
 		if (key not in self.column_definitions): raise ValueException("Given row key is not specified")
 		if (direction not in ( Abstract.SORT_ASCENDING, Abstract.SORT_DESCENDING )): raise TypeException("Sort direction given is invalid")
 
-		self.default_sort_definition = { "key": key, "direction": direction }
+		self.default_sort_definition = { "key": self.column_definitions[key]['sort_key'],
+		                                 "direction": direction
+		                               }
 	#
 
 	def set_limit(self, limit):
