@@ -81,9 +81,9 @@ Total number of pages available
 		"""
 Direction of the current sort value
 		"""
-		self.sort_row_key = ""
+		self.sort_column_key = ""
 		"""
-Row key of the current sort value
+Column key of the current sort value
 		"""
 		self.table = None
 		"""
@@ -141,9 +141,9 @@ Action for "render_subs"
 		if (sort_value != ""):
 		#
 			self.sort_direction = sort_value[-1:]
-			self.sort_row_key = sort_value[:-1]
+			self.sort_column_key = sort_value[:-1]
 
-			self.table.add_sort_definition(self.sort_row_key, self.sort_direction)
+			self.table.add_sort_definition(self.sort_column_key, self.sort_direction)
 		#
 
 		rendered_content = self._render_table_header()
@@ -153,10 +153,10 @@ Action for "render_subs"
 		self.set_action_result(rendered_content)
 	#
 
-	def _get_sort_value(self, row_key):
+	def _get_sort_value(self, column_key):
 	#
 		"""
-Returns the value used to sort the row based on the current one.
+Returns the value used to sort the column based on the current one.
 
 :return: (str) Sort value
 :since:  v0.1.02
@@ -164,8 +164,8 @@ Returns the value used to sort the row based on the current one.
 
 		_return = ""
 
-		if (self.sort_row_key != row_key): _return = "{0}+".format(row_key)
-		elif (self.sort_direction == "+"): _return = "{0}-".format(row_key)
+		if (self.sort_column_key != column_key): _return = "{0}+".format(column_key)
+		elif (self.sort_direction == "+"): _return = "{0}-".format(column_key)
 
 		return _return
 	#
@@ -189,8 +189,18 @@ Renders the table cell based on the given column definition.
 
 		callback = None
 
-		td_attributes = { "tag": "td" }
-		if (css_text_align_definition is not None): td_attributes['attributes'] = { "style": css_text_align_definition }
+		td_attributes = { "tag": "td", "attributes": { } }
+		if (css_text_align_definition is not None): td_attributes['attributes']['style'] = css_text_align_definition
+
+		if (column_definition['sortable']
+		    and self.sort_column_key == column_definition['key']
+		   ):
+		#
+			td_attributes['attributes']['class'] = ("pagetable_column_sorted_asc"
+			                                        if (self.sort_direction == "+") else
+			                                        "pagetable_column_sorted_desc"
+			                                       )
+		#
 
 		column_type = column_definition['renderer'].get("type")
 
@@ -288,6 +298,16 @@ Renders the table header and page navigation if applicable.
 			                                }
 			                }
 
+			if (column_definition['sortable']
+			    and self.sort_column_key == column_key
+			   ):
+			#
+				th_attributes['attributes']['class'] = ("pagetable_column_sorted_asc"
+				                                        if (self.sort_direction == "+") else
+				                                        "pagetable_column_sorted_desc"
+				                                       )
+			#
+
 			_return += xml_parser.dict_to_xml_item_encoder(th_attributes, False)
 
 			if (column_definition['sortable']):
@@ -304,7 +324,9 @@ Renders the table header and page navigation if applicable.
 
 				link_attributes = { "tag": "a", "attributes": { "href": link }, "value": column_definition['title'] }
 
-				_return += XmlParser().dict_to_xml_item_encoder(link_attributes)
+				_return += XmlParser().dict_to_xml_item_encoder(link_attributes, False)
+				if (self.sort_column_key == column_key): _return += "<span></span>"
+				_return += "</a>"
 			#
 			else: _return += XHtmlFormatting.escape(column_definition['title'])
 
