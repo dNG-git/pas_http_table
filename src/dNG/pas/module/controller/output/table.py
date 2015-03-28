@@ -131,7 +131,7 @@ Action for "render_subs"
 		limit = self.table.get_limit()
 		row_count = self.table.get_row_count()
 
-		self.page = (self.context['page'] if ("page" in self.context) else 1)
+		self.page = self.context.get("page", 1)
 		self.pages = (1 if (row_count == 0) else ceil(float(row_count) / limit))
 
 		self.table.set_offset(0 if (self.page < 1 or self.page > self.pages) else (self.page - 1) * limit)
@@ -145,6 +145,8 @@ Action for "render_subs"
 
 			self.table.add_sort_definition(self.sort_column_key, self.sort_direction)
 		#
+
+		if (self.response.is_supported("html_css_files")): self.response.add_theme_css_file("table_sprite.min.css")
 
 		rendered_content = self._render_table_header()
 		rendered_content += self._render_table_rows()
