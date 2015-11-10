@@ -38,11 +38,14 @@ from os import path
 
 with TemporaryDirectory(dir = ".") as build_directory:
 #
+	css_copyright = "pas.http.table #echo(pasHttpTableVersion)# - (C) direct Netware Group - All rights reserved"
+
 	parameters = { "install_data_plain_copy_extensions": "tsc",
-	               "pasHttpTableVersion": get_version()
+	               "pasHttpTableVersion": get_version(),
+	               "css_header": css_js_copyright, "css_min_filenames": True
 	             }
 
-	InstallData.add_install_data_callback(InstallData.plain_copy, [ "data" ])
+	InstallData.add_install_data_callback(InstallData.plain_copy, [ "data", "lang" ])
 	InstallData.set_build_target_path(build_directory)
 	InstallData.set_build_target_parameters(parameters)
 

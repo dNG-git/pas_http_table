@@ -21,7 +21,7 @@ $table-sort-position: 0;
 
 // Small sprite size is not used for sort symbols
 
-@media only screen and (min-width: 46em) and (max-width: 62em) {
+@media only screen and (max-width: 672px) {
 	// Medium sprite size is 24x17 px
 	$table-sort-width: 24px;
 	$table-sort-height: 17px;
