@@ -25,6 +25,7 @@ from os import urandom
 from dNG.data.xml_parser import XmlParser
 from dNG.pas.data.binary import Binary
 from dNG.pas.data.http.translatable_exception import TranslatableException
+from dNG.pas.data.text.l10n import L10n
 from dNG.pas.data.xhtml.formatting import Formatting as XHtmlFormatting
 from dNG.pas.data.xhtml.page_links_renderer import PageLinksRenderer
 from dNG.pas.data.xhtml.link import Link
@@ -89,43 +90,62 @@ Column key of the current sort value
 		"""
 Table instance
 		"""
+		self.table_options_api_dsd_context = { }
+		"""
+Context data for the table options API service.
+		"""
+		self.table_options_api_service = None
+		"""
+Table options API service path under "table_options"
+		"""
 	#
 
 	def _execute_cell_oset_renderer(self, row, column_definition):
 	#
 		"""
 Renders a cell using the defined OSet template.
+
+:param row: Row data to render
+:param column_definition: Column definition for the cell
+
+:return: (str) Rendered XHTML table cell
+:since:  v0.1.00
 		"""
 
-		row_attributes = column_definition['renderer'].get("oset_row_attributes")
-		template_name = column_definition['renderer'].get("oset_template_name")
-
-		if (not isinstance(row_attributes, list)): row_attributes = [ column_definition['key'] ]
-
-		content = { }
-		for row_attribute in row_attributes: content[row_attribute] = row[row_attribute]
-
-		parser = FileParser()
-		parser.set_oset(self.response.get_oset())
-		return parser.render(template_name, content)
+		return self._render_table_cell_oset_renderer(self._get_table_cell_oset_attributes(row, column_definition),
+		                                             column_definition
+		                                            )
 	#
 
 	def execute_render(self):
 	#
 		"""
-Action for "render_subs"
+Action for "render"
 
 :since: v0.1.00
 		"""
 
-		table = self.context.get("table")
+		table = self.context.get("object")
 		if (not isinstance(table, Abstract)): raise TranslatableException("core_unknown_error", value = "Missing table instance to render")
+
+		L10n.init("pas_http_table")
 
 		if ("dsd_page_key" in self.context): self.dsd_page_key = self.context['dsd_page_key']
 		if ("dsd_sort_key" in self.context): self.dsd_sort_key = self.context['dsd_sort_key']
 		self.table = table
 
+		if ("options_api_service" in self.context):
+		#
+			self.table_options_api_service = self.context['options_api_service']
+			if ("options_api_dsd_context" in self.context): self.table_options_api_dsd_context = self.context['options_api_dsd_context']
+		#
+
 		table_id = self.context.get("id")
+
+		if (self.table_options_api_service is not None
+		    and table_id is None
+		   ): raise TranslatableException("core_unknown_error", value = "Tables with dynamic options need a unique table ID")
+
 		self.table_id = ("pas_table_{0}".format(Binary.str(hexlify(urandom(10)))) if (table_id is None) else table_id)
 
 		limit = self.table.get_limit()
@@ -153,6 +173,27 @@ Action for "render_subs"
 		rendered_content += self._render_table_footer()
 
 		self.set_action_result(rendered_content)
+	#
+
+	def _get_table_cell_oset_attributes(self, row, column_definition):
+	#
+		"""
+Returns the row attributes requested by the column for rendering by an OSet.
+
+:param row: Row data to render
+:param column_definition: Column definition for the cell
+
+:return: (dict) OSet row attributes
+:since:  v0.1.00
+		"""
+
+		_return = { }
+
+		row_attributes = column_definition['renderer'].get("oset_row_attributes")
+		if (not isinstance(row_attributes, list)): row_attributes = [ column_definition['key'] ]
+
+		for row_attribute in row_attributes: _return[row_attribute] = row[row_attribute]
+		return _return
 	#
 
 	def _get_sort_value(self, column_key):
@@ -189,8 +230,6 @@ Renders the table cell based on the given column definition.
 
 		_return = "<td></td>"
 
-		callback = None
-
 		td_attributes = { "tag": "td", "attributes": { } }
 		if (css_text_align_definition is not None): td_attributes['attributes']['style'] = css_text_align_definition
 
@@ -205,29 +244,63 @@ Renders the table cell based on the given column definition.
 		#
 
 		column_type = column_definition['renderer'].get("type")
+		rendered_column_content = None
+
+		if ((column_type == Abstract.COLUMN_RENDERER_CALLBACK
+		     or column_type == Abstract.COLUMN_RENDERER_CALLBACK_OSET
+		    )
+		    and column_definition['renderer'].get("callback") is None
+		   ): raise TypeException("Table column renderer callback is invalid")
 
 		if (column_type == Abstract.COLUMN_RENDERER_CALLBACK):
 		#
-			if (column_definition['renderer'].get("callback") is None): raise TypeException("Table column renderer callback is invalid")
-			callback = column_definition['renderer']['callback']
+			rendered_column_content = column_definition['renderer']['callback'](row, column_definition)
+		#
+		elif (column_type == Abstract.COLUMN_RENDERER_CALLBACK_OSET):
+		#
+			content = self._get_table_cell_oset_attributes(row, column_definition)
+			content = column_definition['renderer']['callback'](content, column_definition)
+
+			rendered_column_content = self._render_table_cell_oset_renderer(content, column_definition)
 		#
 		elif (column_type == Abstract.COLUMN_RENDERER_SAFE_CONTENT):
 		#
 			row_data = row[column_definition['key']]
-			td_attributes['value'] = XHtmlFormatting.escape("{0}".format(row_data))
-
-			_return = XmlParser().dict_to_xml_item_encoder(td_attributes)
+			rendered_column_content = XHtmlFormatting.escape("{0}".format(row_data))
 		#
-		elif (column_type == Abstract.COLUMN_RENDERER_OSET): callback = self._execute_cell_oset_renderer
+		elif (column_type == Abstract.COLUMN_RENDERER_OSET):
+		#
+			rendered_column_content = self._execute_cell_oset_renderer(row, column_definition)
+		#
 
-		if (callback is not None):
+		if (rendered_column_content is not None):
 		#
 			_return = "{0}{1}</td>".format(XmlParser().dict_to_xml_item_encoder(td_attributes, False),
-			                               callback(row, column_definition)
+			                               rendered_column_content
 			                              )
 		#
 
 		return _return
+	#
+
+	def _render_table_cell_oset_renderer(self, content, column_definition):
+	#
+		"""
+Renders a cell using the defined OSet template and the content dictionary
+given.
+
+:param content: Content object
+:param column_definition: Column definition for the cell
+
+:return: (str) Rendered content
+:since:  v0.1.00
+		"""
+
+		template_name = column_definition['renderer'].get("oset_template_name")
+
+		parser = FileParser()
+		parser.set_oset(self.response.get_oset())
+		return parser.render(template_name, content)
 	#
 
 	def _render_table_footer(self):
@@ -339,15 +412,13 @@ Renders the table header and page navigation if applicable.
 
 		if (self.pages > 1):
 		#
-			colspan_value = column_count
-
 			page_link_renderer = PageLinksRenderer({ "__request__": True }, self.page, self.pages)
 			page_link_renderer.set_dsd_page_key(self.dsd_page_key)
 			rendered_links = page_link_renderer.render()
 
 			td_attributes = { "tag": "td",
 			                  "attributes": { "class": "pagetable_navigation",
-			                                  "colspan": colspan_value
+			                                  "colspan": column_count
 			                                }
 			                }
 
@@ -359,6 +430,33 @@ Renders the table header and page navigation if applicable.
 		#
 
 		_return += "</tr></thead>"
+
+		if (self.table_options_api_service is not None):
+		#
+			query_string_parameters = { "m": "output",
+			                            "s": "table_api options {0}".format(self.table_options_api_service.replace(".", " ")),
+			                            "a": "show",
+			                            "dsd": self.table_options_api_dsd_context
+			                          }
+
+			query_string_parameters['dsd']['ddom_id'] = "{0}_options".format(self.table_id)
+
+			query_string = Link().build_url(Link.TYPE_QUERY_STRING, query_string_parameters)
+
+			link_attributes = { "tag": "a", "attributes": { "class": "pagetable_options_placeholder", "data-pas-dom-editor-query": query_string, "href": "" }, "value": L10n.get("pas_http_table_options_show") }
+
+			_return += """
+<script type="text/javascript"><![CDATA[
+require([ "jquery", "pas/HttpJsonApiDomEditor.min" ], function($, HttpJsonApiDomEditor) {{
+	$('#{0} > thead').append('<tr><td colspan="{1:d}"><div class="pagecontent_box pagetable_options_box" id="{0}_options">{2}</div></td></tr>');
+	new HttpJsonApiDomEditor({{ id: "{0}_options", type: "link_activated" }});
+}});
+]]></script>
+			""".format(self.table_id,
+			           column_count,
+			           XmlParser().dict_to_xml_item_encoder(link_attributes)
+			          )
+		#
 
 		return _return
 	#
