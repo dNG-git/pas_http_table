@@ -35,6 +35,27 @@ columns in a standardized way.
              Mozilla Public License, v. 2.0
 	"""
 
+	def get(self, key, default = None):
+	#
+		"""
+python.org: Return the value for key if key is in the dictionary, else
+default.
+
+:param key: Key
+:param default: Default return value
+
+:return: (mixed) Value
+:since:  v0.1.02
+		"""
+
+		_return = default
+
+		try: _return = self[key]
+		except KeyError: pass
+
+		return _return
+	#
+
 	def __getitem__(self, key):
 	#
 		"""
