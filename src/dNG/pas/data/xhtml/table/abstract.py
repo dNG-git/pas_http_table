@@ -39,6 +39,11 @@ It is used as an iterator to read rows.
              Mozilla Public License, v. 2.0
 	"""
 
+	COLUMN_RENDERER_CALLBACK_OSET = 4
+	"""
+Uses a defined callback to manipulate data before being rendered by
+the OSet "template_name"
+	"""
 	COLUMN_RENDERER_CALLBACK = 3
 	"""
 Uses a defined callback to encode the specified column data
