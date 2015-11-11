@@ -90,7 +90,7 @@ Renders the given field.
 
 		context = { "title": Formatting.escape(self.get_title()),
 		            "content": self._get_content(),
-		            "table": { "table": self.table },
+		            "object": { "table": self.table },
 		            "error_message": ("" if (self.error_data is None) else Formatting.escape(self.get_error_message()))
 		          }
 
