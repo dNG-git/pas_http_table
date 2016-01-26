@@ -61,7 +61,7 @@ Action for "show"
 
 		if (self.__class__.OSET_TEMPLATE_NAME is None): raise NotImplementedException()
 
-		self._set_dom_replace_oset_result(self.__class__.OSET_TEMPLATE_NAME, self._get_show_content())
+		self._set_replace_dom_oset_result(self.__class__.OSET_TEMPLATE_NAME, self._get_show_content())
 	#
 
 	def _get_show_content(self):
