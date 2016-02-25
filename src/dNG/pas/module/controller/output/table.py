@@ -18,13 +18,10 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-from binascii import hexlify
 from math import ceil, floor
-from os import urandom
 
 from dNG.data.xml_parser import XmlParser
-from dNG.pas.data.binary import Binary
-from dNG.pas.data.http.translatable_exception import TranslatableException
+from dNG.pas.data.http.translatable_error import TranslatableError
 from dNG.pas.data.text.l10n import L10n
 from dNG.pas.data.xhtml.formatting import Formatting as XHtmlFormatting
 from dNG.pas.data.xhtml.page_links_renderer import PageLinksRenderer
@@ -32,6 +29,7 @@ from dNG.pas.data.xhtml.link import Link
 from dNG.pas.data.xhtml.oset.file_parser import FileParser
 from dNG.pas.data.xhtml.table.abstract import Abstract
 from dNG.pas.runtime.type_exception import TypeException
+from dNG.pas.runtime.value_exception import ValueException
 from .module import Module
 
 class Table(Module):
@@ -69,6 +67,10 @@ DSD key used for sorting
 		self.page = 1
 		"""
 Page currently rendered
+		"""
+		self.page_limit = 0
+		"""
+Page limit set
 		"""
 		self.page_link_cell = None
 		"""
@@ -125,8 +127,10 @@ Action for "render"
 :since: v0.1.00
 		"""
 
+		if (self._is_primary_action()): raise TranslatableError("core_access_denied", 403)
+
 		table = self.context.get("object")
-		if (not isinstance(table, Abstract)): raise TranslatableException("core_unknown_error", value = "Missing table instance to render")
+		if (not isinstance(table, Abstract)): raise ValueException("Missing table instance to render")
 
 		L10n.init("pas_http_table")
 
@@ -144,17 +148,19 @@ Action for "render"
 
 		if (self.table_options_api_service is not None
 		    and table_id is None
-		   ): raise TranslatableException("core_unknown_error", value = "Tables with dynamic options need a unique table ID")
+		   ): raise ValueException("Tables with dynamic options need a unique table ID")
 
-		self.table_id = ("pas_table_{0}".format(Binary.str(hexlify(urandom(10)))) if (table_id is None) else table_id)
+		self.table_id = ("pas_http_table_{0:d}".format(id(self)) if (table_id is None) else table_id)
 
 		limit = self.table.get_limit()
 		row_count = self.table.get_row_count()
 
 		self.page = self.context.get("page", 1)
+		self.page_limit = self.context.get("page_limit", 0)
 		self.pages = (1 if (row_count == 0) else ceil(float(row_count) / limit))
 
-		self.table.set_offset(0 if (self.page < 1 or self.page > self.pages) else (self.page - 1) * limit)
+		pages = (self.page_limit if (self.page_limit > 0) else self.pages)
+		self.table.set_offset(0 if (self.page < 1 or self.page > pages) else (self.page - 1) * limit)
 
 		sort_value = self.context.get("sort_value", "")
 
@@ -299,7 +305,7 @@ given.
 		template_name = column_definition['renderer'].get("oset_template_name")
 
 		parser = FileParser()
-		parser.set_oset(self.response.get_oset())
+		if (self.response.is_supported("html_theme")): parser.set_oset(self.response.get_oset())
 		return parser.render(template_name, content)
 	#
 
@@ -317,7 +323,7 @@ Renders the table page navigation if applicable and footer.
 		_return = "{0}\n</table>".format(page_link_cell)
 
 		parser = FileParser()
-		parser.set_oset(self.response.get_oset())
+		if (self.response.is_supported("html_theme")): parser.set_oset(self.response.get_oset())
 		_return += parser.render("table.js_footer", { "table_id": self.table_id })
 
 		return _return
@@ -393,7 +399,8 @@ Renders the table header and page navigation if applicable.
 				                        { "__request__": True,
 				                          "dsd": { self.dsd_page_key: 1,
 				                                   self.dsd_sort_key: sort_value
-				                                 }
+				                                 },
+				                          "ohandler": "__remove__"
 				                        }
 				                       )
 
@@ -410,9 +417,11 @@ Renders the table header and page navigation if applicable.
 			if (first_column_percent_addition > 0): first_column_percent_addition = 0
 		#
 
-		if (self.pages > 1):
+		pages = (self.page_limit if (self.page_limit > 0) else self.pages)
+
+		if (pages > 1):
 		#
-			page_link_renderer = PageLinksRenderer({ "__request__": True }, self.page, self.pages)
+			page_link_renderer = PageLinksRenderer({ "__request__": True, "ohandler": "__remove__" }, self.page, pages)
 			page_link_renderer.set_dsd_page_key(self.dsd_page_key)
 			rendered_links = page_link_renderer.render()
 
@@ -423,8 +432,8 @@ Renders the table header and page navigation if applicable.
 			                }
 
 			self.page_link_cell = "{0}{1}</td>".format(xml_parser.dict_to_xml_item_encoder(td_attributes, False),
-			                                                   rendered_links
-			                                                  )
+			                                           rendered_links
+			                                          )
 
 			_return += "</tr>\n<tr>{0}".format(self.page_link_cell)
 		#
