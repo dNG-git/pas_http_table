@@ -166,10 +166,13 @@ Adds a sort definition.
 :since: v0.1.02
 		"""
 
-		if (key not in self.column_definitions): raise ValueException("Given row key is not specified")
+		if (not self._is_sort_key_known(key)): raise ValueException("Given sort key is not known")
 		if (direction not in ( Abstract.SORT_ASCENDING, Abstract.SORT_DESCENDING )): raise TypeException("Sort direction given is invalid")
 
-		self.sort_list.append({ "key": self.column_definitions[key]['sort_key'],
+		self.sort_list.append({ "key": (self.column_definitions[key]['sort_key']
+		                                if (key in self.column_definitions) else
+		                                key
+		                               ),
 		                        "direction": direction
 		                      })
 	#
@@ -184,7 +187,7 @@ Disables sorting for the specified rows.
 
 		for key in args:
 		#
-			if (key not in self.column_definitions): raise ValueException("Given row key is not specified")
+			if (key not in self.column_definitions): raise ValueException("Given row key is not defined")
 			self.column_definitions[key]['sortable'] = False
 		#
 	#
@@ -249,6 +252,20 @@ Returns the number of rows.
 		raise NotImplementedException()
 	#
 
+	def _is_sort_key_known(self, key):
+	#
+		"""
+Checks if the given sort key is known.
+
+:param key: Key used internally
+
+:return: (bool) Returns true if the sort key is known
+:since:  v0.1.02
+		"""
+
+		return (key in self.column_definitions)
+	#
+
 	def set_default_sort_definition(self, key, direction):
 	#
 		"""
@@ -260,7 +277,7 @@ Sets the default sort definition to be used.
 :since: v0.1.02
 		"""
 
-		if (key not in self.column_definitions): raise ValueException("Given row key is not specified")
+		if (not self._is_sort_key_known(key)): raise ValueException("Given sort key is not known")
 		if (direction not in ( Abstract.SORT_ASCENDING, Abstract.SORT_DESCENDING )): raise TypeException("Sort direction given is invalid")
 
 		self.default_sort_definition = { "key": self.column_definitions[key]['sort_key'],
