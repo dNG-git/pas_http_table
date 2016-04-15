@@ -42,7 +42,7 @@ with TemporaryDirectory(dir = ".") as build_directory:
 
 	parameters = { "install_data_plain_copy_extensions": "tsc",
 	               "pasHttpTableVersion": get_version(),
-	               "css_header": css_js_copyright, "css_min_filenames": True
+	               "css_header": css_copyright, "css_min_filenames": True
 	             }
 
 	InstallData.add_install_data_callback(InstallData.plain_copy, [ "data", "lang" ])
