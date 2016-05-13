@@ -31,6 +31,7 @@ Returns the version currently in development.
 
 from dNG.distutils.command.build_py import BuildPy
 from dNG.distutils.command.install_data import InstallData
+from dNG.distutils.command.install_css_data import InstallCssData
 from dNG.distutils.temporary_directory import TemporaryDirectory
 
 from distutils.core import setup
