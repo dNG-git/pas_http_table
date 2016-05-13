@@ -46,6 +46,7 @@ with TemporaryDirectory(dir = ".") as build_directory:
 	             }
 
 	InstallData.add_install_data_callback(InstallData.plain_copy, [ "data", "lang" ])
+	InstallData.add_install_data_callback(InstallCssData.callback, [ "data" ])
 	InstallData.set_build_target_path(build_directory)
 	InstallData.set_build_target_parameters(parameters)
 
