@@ -40,7 +40,7 @@ with TemporaryDirectory(dir = ".") as build_directory:
 #
 	css_copyright = "pas.http.table #echo(pasHttpTableVersion)# - (C) direct Netware Group - All rights reserved"
 
-	parameters = { "install_data_plain_copy_extensions": "tsc",
+	parameters = { "install_data_plain_copy_extensions": "jpg,json,png,tsc",
 	               "pasHttpTableVersion": get_version(),
 	               "css_header": css_copyright, "css_min_filenames": True
 	             }
@@ -55,10 +55,12 @@ with TemporaryDirectory(dir = ".") as build_directory:
 	      version = get_version(),
 	      description = "Python Application Services",
 	      long_description = """"pas_http_table" provides a common XHTML table handler used for structured data.""",
-	      author = "direct Netware Group",
+	      author = "direct Netware Group et al.",
 	      author_email = "web@direct-netware.de",
 	      license = "MPL2",
 	      url = "https://www.direct-netware.de/redirect?pas;http;table",
+
+	      platforms = [ "any" ],
 
 	      package_dir = { "": _build_path },
 	      packages = [ "dNG" ],
