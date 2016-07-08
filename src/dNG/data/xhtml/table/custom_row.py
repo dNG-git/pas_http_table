@@ -18,42 +18,36 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-from dNG.pas.runtime.not_implemented_exception import NotImplementedException
+from .abstract_row import AbstractRow
 
-class AbstractRow(object):
+class CustomRow(AbstractRow):
 #
 	"""
-"AbstractRow" provides properties for column keys and is used to access row
-columns in a standardized way.
+"CustomRow" uses the given dict as the data source.
 
-:author:     direct Netware Group
+:author:     direct Netware Group et al.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: table
-:since:      v0.1.00
+:since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
 	"""
 
-	def get(self, key, default = None):
+	def __init__(self, data):
 	#
 		"""
-python.org: Return the value for key if key is in the dictionary, else
-default.
+Constructor __init__(CustomRow)
 
-:param key: Key
-:param default: Default return value
+:param data: Row data
 
-:return: (mixed) Value
-:since:  v0.1.02
+:since: v0.2.00
 		"""
 
-		_return = default
-
-		try: _return = self[key]
-		except KeyError: pass
-
-		return _return
+		self.data = data
+		"""
+Data dict
+		"""
 	#
 
 	def __getitem__(self, key):
@@ -64,10 +58,10 @@ python.org: Called to implement evaluation of self[key].
 :param name: Attribute name
 
 :return: (mixed) Attribute value
-:since:  v0.1.00
+:since:  v0.2.00
 		"""
 
-		raise NotImplementedException()
+		return self.data.get(key)
 	#
 #
 

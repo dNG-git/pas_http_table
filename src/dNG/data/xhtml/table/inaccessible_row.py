@@ -18,51 +18,24 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-from .abstract_row import AbstractRow
+from .custom_row import CustomRow
 
-class CustomRow(AbstractRow):
+class InaccessibleRow(CustomRow):
 #
 	"""
-"CustomRow" uses the given dict as the data source.
+"InaccessibleRow" extends "CustomRow" to indicate that the underlying source
+is not accessible.
 
-:author:     direct Netware Group
+:author:     direct Netware Group et al.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: table
-:since:      v0.1.00
+:since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
 	"""
 
-	def __init__(self, data):
-	#
-		"""
-Constructor __init__(CustomRow)
-
-:param data: Row data
-
-:since: v0.1.00
-		"""
-
-		self.data = data
-		"""
-Data dict
-		"""
-	#
-
-	def __getitem__(self, key):
-	#
-		"""
-python.org: Called to implement evaluation of self[key].
-
-:param name: Attribute name
-
-:return: (mixed) Attribute value
-:since:  v0.1.00
-		"""
-
-		return self.data.get(key)
-	#
+	pass
 #
 
 ##j## EOF

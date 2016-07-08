@@ -18,7 +18,8 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-from dNG.pas.data.xhtml.formatting import Formatting
+from dNG.data.xhtml.formatting import Formatting
+
 from .abstract_field import AbstractField
 from .read_only_field_mixin import ReadOnlyFieldMixin
 
@@ -27,11 +28,11 @@ class InfoTableField(ReadOnlyFieldMixin, AbstractField):
 	"""
 "InfoTableField" provides a table for the field content.
 
-:author:     direct Netware Group
+:author:     direct Netware Group et al.
 :copyright:  direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: table
-:since:      v0.1.00
+:since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
 	"""
@@ -43,7 +44,7 @@ Constructor __init__(InfoTableField)
 
 :param name: Form field name
 
-:since: v0.1.00
+:since: v0.2.00
 		"""
 
 		AbstractField.__init__(self, name)
@@ -61,7 +62,7 @@ Table used for the field content
 Returns the field content.
 
 :return: (str) Field content
-:since:  v0.1.00
+:since:  v0.2.00
 		"""
 
 		return Formatting.escape(AbstractField._get_content(self))
@@ -73,7 +74,7 @@ Returns the field content.
 Returns the field type.
 
 :return: (str) Field type
-:since:  v0.1.00
+:since:  v0.2.00
 		"""
 
 		return "infotable"
@@ -85,7 +86,7 @@ Returns the field type.
 Renders the given field.
 
 :return: (str) Valid XHTML form field definition
-:since:  v0.1.00
+:since:  v0.2.00
 		"""
 
 		context = { "title": Formatting.escape(self.get_title()),
@@ -104,7 +105,7 @@ Sets the table used for the field content.
 
 :param link: Link URL
 
-:since: v0.1.00
+:since: v0.2.00
 		"""
 
 		self.table = table

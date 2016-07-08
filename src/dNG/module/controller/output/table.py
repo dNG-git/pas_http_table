@@ -20,16 +20,17 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 
 from math import ceil, floor
 
+from dNG.data.http.translatable_error import TranslatableError
+from dNG.data.text.l10n import L10n
+from dNG.data.xhtml.formatting import Formatting as XHtmlFormatting
+from dNG.data.xhtml.page_links_renderer import PageLinksRenderer
+from dNG.data.xhtml.link import Link
+from dNG.data.xhtml.oset.file_parser import FileParser
+from dNG.data.xhtml.table.abstract import Abstract
 from dNG.data.xml_parser import XmlParser
-from dNG.pas.data.http.translatable_error import TranslatableError
-from dNG.pas.data.text.l10n import L10n
-from dNG.pas.data.xhtml.formatting import Formatting as XHtmlFormatting
-from dNG.pas.data.xhtml.page_links_renderer import PageLinksRenderer
-from dNG.pas.data.xhtml.link import Link
-from dNG.pas.data.xhtml.oset.file_parser import FileParser
-from dNG.pas.data.xhtml.table.abstract import Abstract
-from dNG.pas.runtime.type_exception import TypeException
-from dNG.pas.runtime.value_exception import ValueException
+from dNG.runtime.type_exception import TypeException
+from dNG.runtime.value_exception import ValueException
+
 from .module import Module
 
 class Table(Module):
@@ -37,11 +38,11 @@ class Table(Module):
 	"""
 "Table" is used to render a table of rows of columns.
 
-:author:     direct Netware Group
+:author:     direct Netware Group et al.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: table
-:since:      v0.1.00
+:since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
 	"""
@@ -51,7 +52,7 @@ class Table(Module):
 		"""
 Constructor __init__(Table)
 
-:since: v0.1.00
+:since: v0.2.00
 		"""
 
 		Module.__init__(self)
@@ -111,7 +112,7 @@ Renders a cell using the defined OSet template.
 :param column_definition: Column definition for the cell
 
 :return: (str) Rendered XHTML table cell
-:since:  v0.1.00
+:since:  v0.2.00
 		"""
 
 		return self._render_table_cell_oset_renderer(self._get_table_cell_oset_attributes(row, column_definition),
@@ -124,7 +125,7 @@ Renders a cell using the defined OSet template.
 		"""
 Action for "render"
 
-:since: v0.1.00
+:since: v0.2.00
 		"""
 
 		if (self._is_primary_action()): raise TranslatableError("core_access_denied", 403)
@@ -190,7 +191,7 @@ Returns the row attributes requested by the column for rendering by an OSet.
 :param column_definition: Column definition for the cell
 
 :return: (dict) OSet row attributes
-:since:  v0.1.00
+:since:  v0.2.00
 		"""
 
 		_return = { }
@@ -208,7 +209,7 @@ Returns the row attributes requested by the column for rendering by an OSet.
 Returns the value used to sort the column based on the current one.
 
 :return: (str) Sort value
-:since:  v0.1.02
+:since:  v0.2.00
 		"""
 
 		_return = ""
@@ -228,7 +229,7 @@ Renders the table cell based on the given column definition.
 :param column_definition: Column definition for the cell
 
 :return: (str) Rendered XHTML table cell
-:since:  v0.1.00
+:since:  v0.2.00
 		"""
 
 		css_text_align_value = column_definition['renderer'].get("css_text_align", "left")
@@ -299,7 +300,7 @@ given.
 :param column_definition: Column definition for the cell
 
 :return: (str) Rendered content
-:since:  v0.1.00
+:since:  v0.2.00
 		"""
 
 		template_name = column_definition['renderer'].get("oset_template_name")
@@ -315,7 +316,7 @@ given.
 Renders the table page navigation if applicable and footer.
 
 :return: (str) Rendered XHTML table footer
-:since:  v0.1.00
+:since:  v0.2.00
 		"""
 
 		page_link_cell = ("" if (self.page_link_cell is None) else "\n<tfoot><tr>{0}</tr></tfoot>".format(self.page_link_cell))
@@ -335,7 +336,7 @@ Renders the table page navigation if applicable and footer.
 Renders the table header and page navigation if applicable.
 
 :return: (str) Rendered XHTML table header
-:since:  v0.1.00
+:since:  v0.2.00
 		"""
 
 		table_percent_remaining = self.table.get_percent_remaining()
@@ -478,7 +479,7 @@ Renders the table row.
 :param row: Row data to render
 
 :return: (str) Rendered XHTML table row
-:since:  v0.1.00
+:since:  v0.2.00
 		"""
 
 		_return = "\n<tr>"
@@ -501,7 +502,7 @@ Renders the table row.
 Renders the table rows.
 
 :return: (str) Rendered XHTML table rows
-:since:  v0.1.00
+:since:  v0.2.00
 		"""
 
 		_return = "<tbody>"

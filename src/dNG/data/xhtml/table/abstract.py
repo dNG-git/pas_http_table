@@ -18,11 +18,11 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-from dNG.pas.data.supports_mixin import SupportsMixin
-from dNG.pas.runtime.iterator import Iterator
-from dNG.pas.runtime.not_implemented_exception import NotImplementedException
-from dNG.pas.runtime.type_exception import TypeException
-from dNG.pas.runtime.value_exception import ValueException
+from dNG.data.supports_mixin import SupportsMixin
+from dNG.runtime.iterator import Iterator
+from dNG.runtime.not_implemented_exception import NotImplementedException
+from dNG.runtime.type_exception import TypeException
+from dNG.runtime.value_exception import ValueException
 
 class Abstract(Iterator, SupportsMixin):
 #
@@ -30,11 +30,11 @@ class Abstract(Iterator, SupportsMixin):
 "Abstract" defines all methods used to define a table, its columns and rows.
 It is used as an iterator to read rows.
 
-:author:     direct Netware Group
+:author:     direct Netware Group et al.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: table
-:since:      v0.1.00
+:since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
 	"""
@@ -70,7 +70,7 @@ Descending sort direction
 		"""
 Constructor __init__(Abstract)
 
-:since: v0.1.00
+:since: v0.2.00
 		"""
 
 		SupportsMixin.__init__(self)
@@ -119,7 +119,7 @@ Sort list to be applied
 python.org: Return the next item from the container.
 
 :return: (object) Result object
-:since:  v0.1.00
+:since:  v0.2.00
 		"""
 
 		raise NotImplementedException()
@@ -135,7 +135,7 @@ Add a column with the given properties.
 :param size: Size in percent
 :param renderer: Renderer definition
 
-:since: v0.1.00
+:since: v0.2.00
 		"""
 
 		if (size > self.percent_remaining): raise ValueException("Given size exceeds remaining one")
@@ -163,7 +163,7 @@ Adds a sort definition.
 :param key: Row key to sort
 :param direction: Sort direction
 
-:since: v0.1.02
+:since: v0.2.00
 		"""
 
 		if (not self._is_sort_key_known(key)): raise ValueException("Given sort key is not known")
@@ -182,7 +182,7 @@ Adds a sort definition.
 		"""
 Disables sorting for the specified rows.
 
-:since: v0.1.00
+:since: v0.2.00
 		"""
 
 		for key in args:
@@ -198,7 +198,7 @@ Disables sorting for the specified rows.
 Returns a dict of all column definitions.
 
 :return: (dict) Column definitions
-:since:  v0.1.00
+:since:  v0.2.00
 		"""
 
 		return self.column_definitions
@@ -210,7 +210,7 @@ Returns a dict of all column definitions.
 Returns a list of all column keys.
 
 :return: (list) Column keys
-:since:  v0.1.00
+:since:  v0.2.00
 		"""
 
 		return self.columns
@@ -222,7 +222,7 @@ Returns a list of all column keys.
 Returns the limit of rows requested.
 
 :return: (int) Maximum number of rows requested; -1 for unlimited
-:since:  v0.1.00
+:since:  v0.2.00
 		"""
 
 		return self.limit
@@ -234,7 +234,7 @@ Returns the limit of rows requested.
 Returns the percent remaining to be at 100%.
 
 :return: (int) Percent value
-:since:  v0.1.00
+:since:  v0.2.00
 		"""
 
 		return self.percent_remaining
@@ -246,7 +246,7 @@ Returns the percent remaining to be at 100%.
 Returns the number of rows.
 
 :return: (int) Number of rows
-:since:  v0.1.00
+:since:  v0.2.00
 		"""
 
 		raise NotImplementedException()
@@ -260,7 +260,7 @@ Checks if the given sort key is known.
 :param key: Key used internally
 
 :return: (bool) Returns true if the sort key is known
-:since:  v0.1.02
+:since:  v0.2.00
 		"""
 
 		return (key in self.column_definitions)
@@ -274,7 +274,7 @@ Sets the default sort definition to be used.
 :param key: Row key to sort
 :param direction: Sort direction
 
-:since: v0.1.02
+:since: v0.2.00
 		"""
 
 		if (not self._is_sort_key_known(key)): raise ValueException("Given sort key is not known")
@@ -292,7 +292,7 @@ Sets the limit of rows requested.
 
 :param limit: Maximum number of rows requested; -1 for unlimited
 
-:since: v0.1.00
+:since: v0.2.00
 		"""
 
 		self.limit = limit
@@ -305,7 +305,7 @@ Sets the row offset requested.
 
 :param offset: Row offset requested
 
-:since: v0.1.00
+:since: v0.2.00
 		"""
 
 		self.offset = offset
@@ -318,7 +318,7 @@ Sets the sort context to be used.
 
 :param context: Sort context
 
-:since: v0.1.00
+:since: v0.2.00
 		"""
 
 		self.sort_context = context

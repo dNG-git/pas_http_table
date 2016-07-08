@@ -24,11 +24,11 @@ class SourceCallbacksMixin(object):
 "SourceCallbacksMixin" provides methods to receive the rows from an external
 source with registered callbacks.
 
-:author:     direct Netware Group
+:author:     direct Netware Group et al.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: table
-:since:      v0.1.00
+:since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
 	"""
@@ -38,7 +38,7 @@ source with registered callbacks.
 		"""
 Constructor __init__(SourceCallbacksMixin)
 
-:since: v0.1.00
+:since: v0.2.00
 		"""
 
 		self.source_row_count_callback = None
@@ -61,7 +61,7 @@ Sets the callbacks to receive the iterator source from.
 :param row_count_callback: The count callback is used to receive the number
                            of rows available.
 
-:since: v0.1.00
+:since: v0.2.00
 		"""
 
 		self.source_rows_callback = rows_callback

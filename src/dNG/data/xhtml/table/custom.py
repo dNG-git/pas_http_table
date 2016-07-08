@@ -18,7 +18,8 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-from dNG.pas.runtime.value_exception import ValueException
+from dNG.runtime.value_exception import ValueException
+
 from .abstract import Abstract as _Abstract
 from .custom_row import CustomRow
 
@@ -27,11 +28,11 @@ class Custom(_Abstract):
 	"""
 "Custom" defines a table based on manually defined rows.
 
-:author:     direct Netware Group
+:author:     direct Netware Group et al.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: table
-:since:      v0.1.00
+:since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
 	"""
@@ -41,7 +42,7 @@ class Custom(_Abstract):
 		"""
 Constructor __init__(Custom)
 
-:since: v0.1.00
+:since: v0.2.00
 		"""
 
 		_Abstract.__init__(self)
@@ -62,7 +63,7 @@ List of rows
 python.org: Return an iterator object.
 
 :return: (object) Iterator object
-:since:  v0.1.00
+:since:  v0.2.00
 		"""
 
 		return iter(self.rows)
@@ -73,7 +74,7 @@ python.org: Return an iterator object.
 		"""
 Adds row data to this table.
 
-:since: v0.1.00
+:since: v0.2.00
 		"""
 
 		self.rows.append(CustomRow(kwargs))
@@ -85,7 +86,7 @@ Adds row data to this table.
 Returns the number of rows.
 
 :return: (int) Number of rows
-:since:  v0.1.00
+:since:  v0.2.00
 		"""
 
 		if (self.row_count is None): self.row_count = len(self.rows)
@@ -99,7 +100,7 @@ Sets the row count.
 
 :param row_count: Number of rows
 
-:since: v0.1.00
+:since: v0.2.00
 		"""
 
 		self.row_count = row_count

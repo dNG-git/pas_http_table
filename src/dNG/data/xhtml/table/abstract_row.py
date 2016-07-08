@@ -18,34 +18,56 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-from dNG.pas.database.connection import Connection
-from .table import Table
+from dNG.runtime.not_implemented_exception import NotImplementedException
 
-class DatabaseTable(Table):
+class AbstractRow(object):
 #
 	"""
-The "DatabaseTable" is used to render a table of rows of columns from the
-database.
+"AbstractRow" provides properties for column keys and is used to access row
+columns in a standardized way.
 
-:author:     direct Netware Group
+:author:     direct Netware Group et al.
 :copyright:  (C) direct Netware Group - All rights reserved
 :package:    pas.http
 :subpackage: table
-:since:      v0.1.02
+:since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
 	"""
 
-	@Connection.wrap_callable
-	def execute_render(self):
+	def get(self, key, default = None):
 	#
 		"""
-Action for "render"
+python.org: Return the value for key if key is in the dictionary, else
+default.
 
-:since: v0.1.02
+:param key: Key
+:param default: Default return value
+
+:return: (mixed) Value
+:since:  v0.2.00
 		"""
 
-		Table.execute_render(self)
+		_return = default
+
+		try: _return = self[key]
+		except KeyError: pass
+
+		return _return
+	#
+
+	def __getitem__(self, key):
+	#
+		"""
+python.org: Called to implement evaluation of self[key].
+
+:param name: Attribute name
+
+:return: (mixed) Attribute value
+:since:  v0.2.00
+		"""
+
+		raise NotImplementedException()
 	#
 #
 
