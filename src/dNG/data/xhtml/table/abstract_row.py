@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -21,8 +20,7 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 from dNG.runtime.not_implemented_exception import NotImplementedException
 
 class AbstractRow(object):
-#
-	"""
+    """
 "AbstractRow" provides properties for column keys and is used to access row
 columns in a standardized way.
 
@@ -33,11 +31,10 @@ columns in a standardized way.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def get(self, key, default = None):
-	#
-		"""
+    def get(self, key, default = None):
+        """
 python.org: Return the value for key if key is in the dictionary, else
 default.
 
@@ -46,29 +43,26 @@ default.
 
 :return: (mixed) Value
 :since:  v0.2.00
-		"""
+        """
 
-		_return = default
+        _return = default
 
-		try: _return = self[key]
-		except KeyError: pass
+        try: _return = self[key]
+        except KeyError: pass
 
-		return _return
-	#
+        return _return
+    #
 
-	def __getitem__(self, key):
-	#
-		"""
+    def __getitem__(self, key):
+        """
 python.org: Called to implement evaluation of self[key].
 
 :param name: Attribute name
 
 :return: (mixed) Attribute value
 :since:  v0.2.00
-		"""
+        """
 
-		raise NotImplementedException()
-	#
+        raise NotImplementedException()
+    #
 #
-
-##j## EOF

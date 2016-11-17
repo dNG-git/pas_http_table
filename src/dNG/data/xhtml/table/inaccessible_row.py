@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -21,8 +20,7 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 from .custom_row import CustomRow
 
 class InaccessibleRow(CustomRow):
-#
-	"""
+    """
 "InaccessibleRow" extends "CustomRow" to indicate that the underlying source
 is not accessible.
 
@@ -33,9 +31,7 @@ is not accessible.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	pass
+    pass
 #
-
-##j## EOF

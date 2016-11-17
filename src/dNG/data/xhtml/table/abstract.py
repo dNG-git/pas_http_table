@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -25,8 +24,7 @@ from dNG.runtime.type_exception import TypeException
 from dNG.runtime.value_exception import ValueException
 
 class Abstract(Iterator, SupportsMixin):
-#
-	"""
+    """
 "Abstract" defines all methods used to define a table, its columns and rows.
 It is used as an iterator to read rows.
 
@@ -37,97 +35,94 @@ It is used as an iterator to read rows.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	COLUMN_RENDERER_CALLBACK_OSET = 4
-	"""
+    COLUMN_RENDERER_CALLBACK_OSET = 4
+    """
 Uses a defined callback to manipulate data before being rendered by
 the OSet "template_name"
-	"""
-	COLUMN_RENDERER_CALLBACK = 3
-	"""
+    """
+    COLUMN_RENDERER_CALLBACK = 3
+    """
 Uses a defined callback to encode the specified column data
-	"""
-	COLUMN_RENDERER_OSET = 1
-	"""
+    """
+    COLUMN_RENDERER_OSET = 1
+    """
 Uses "template_name" to render the OSet with the specified column data
-	"""
-	COLUMN_RENDERER_SAFE_CONTENT = 2
-	"""
+    """
+    COLUMN_RENDERER_SAFE_CONTENT = 2
+    """
 Encodes the specified column data to be shown as XHTML content
-	"""
-	SORT_ASCENDING = "+"
-	"""
+    """
+    SORT_ASCENDING = "+"
+    """
 Ascending sort direction
-	"""
-	SORT_DESCENDING = "-"
-	"""
+    """
+    SORT_DESCENDING = "-"
+    """
 Descending sort direction
-	"""
+    """
 
-	def __init__(self):
-	#
-		"""
+    def __init__(self):
+        """
 Constructor __init__(Abstract)
 
 :since: v0.2.00
-		"""
+        """
 
-		SupportsMixin.__init__(self)
+        SupportsMixin.__init__(self)
 
-		self.column_definitions = { }
-		"""
+        self.column_definitions = { }
+        """
 Column definitions
-		"""
-		self.columns = [ ]
-		"""
+        """
+        self.columns = [ ]
+        """
 List of columns
-		"""
-		self.default_sort_definition = None
-		"""
+        """
+        self.default_sort_definition = None
+        """
 Default sort definition to be used
-		"""
-		self.hide_column_titles = False
-		"""
+        """
+        self.hide_column_titles = False
+        """
 True to hide column titles
-		"""
-		self.limit = -1
-		"""
+        """
+        self.limit = -1
+        """
 Limit of rows requested
-		"""
-		self.offset = 0
-		"""
+        """
+        self.offset = 0
+        """
 Row offset requested
-		"""
-		self.percent_remaining = 100
-		"""
+        """
+        self.percent_remaining = 100
+        """
 Percent remaining for additional columns
-		"""
-		self.sort_context = None
-		"""
+        """
+        self.sort_context = None
+        """
 Sort context to be used
-		"""
-		self.sort_list = [ ]
-		"""
+        """
+        self.sort_list = [ ]
+        """
 Sort list to be applied
-		"""
-	#
+        """
+    #
 
-	def __next__(self):
-	#
-		"""
+    def __next__(self):
+        """
 python.org: Return the next item from the container.
 
 :return: (object) Result object
 :since:  v0.2.00
-		"""
+        """
 
-		raise NotImplementedException()
-	#
+        raise NotImplementedException()
+    #
 
-	def add_column(self, key, title, size, sort_key = None, renderer = None):
-	#
-		"""
+    def add_column(self, key, title, size, sort_key = None, renderer = None):
+        """
 Add a column with the given properties.
 
 :param key: Key used internally to identify this column
@@ -136,193 +131,178 @@ Add a column with the given properties.
 :param renderer: Renderer definition
 
 :since: v0.2.00
-		"""
+        """
 
-		if (size > self.percent_remaining): raise ValueException("Given size exceeds remaining one")
-		self.percent_remaining -= size
+        if (size > self.percent_remaining): raise ValueException("Given size exceeds remaining one")
+        self.percent_remaining -= size
 
-		if (key not in self.column_definitions): self.columns.append(key)
+        if (key not in self.column_definitions): self.columns.append(key)
 
-		if (renderer is None): renderer = { "type": Abstract.COLUMN_RENDERER_SAFE_CONTENT }
-		if (sort_key is None): sort_key = key
+        if (renderer is None): renderer = { "type": Abstract.COLUMN_RENDERER_SAFE_CONTENT }
+        if (sort_key is None): sort_key = key
 
-		self.column_definitions[key] = { "key": key,
-		                                 "title": title,
-		                                 "size": size,
-		                                 "sort_key": sort_key,
-		                                 "sortable": self.is_supported("sorting"),
-		                                 "renderer": renderer
-		                               }
-	#
+        self.column_definitions[key] = { "key": key,
+                                         "title": title,
+                                         "size": size,
+                                         "sort_key": sort_key,
+                                         "sortable": self.is_supported("sorting"),
+                                         "renderer": renderer
+                                       }
+    #
 
-	def add_sort_definition(self, key, direction):
-	#
-		"""
+    def add_sort_definition(self, key, direction):
+        """
 Adds a sort definition.
 
 :param key: Row key to sort
 :param direction: Sort direction
 
 :since: v0.2.00
-		"""
+        """
 
-		if (not self._is_sort_key_known(key)): raise ValueException("Given sort key is not known")
-		if (direction not in ( Abstract.SORT_ASCENDING, Abstract.SORT_DESCENDING )): raise TypeException("Sort direction given is invalid")
+        if (not self._is_sort_key_known(key)): raise ValueException("Given sort key is not known")
+        if (direction not in ( Abstract.SORT_ASCENDING, Abstract.SORT_DESCENDING )): raise TypeException("Sort direction given is invalid")
 
-		self.sort_list.append({ "key": (self.column_definitions[key]['sort_key']
-		                                if (key in self.column_definitions) else
-		                                key
-		                               ),
-		                        "direction": direction
-		                      })
-	#
+        self.sort_list.append({ "key": (self.column_definitions[key]['sort_key']
+                                        if (key in self.column_definitions) else
+                                        key
+                                       ),
+                                "direction": direction
+                              })
+    #
 
-	def disable_sort(self, *args):
-	#
-		"""
+    def disable_sort(self, *args):
+        """
 Disables sorting for the specified rows.
 
 :since: v0.2.00
-		"""
+        """
 
-		for key in args:
-		#
-			if (key not in self.column_definitions): raise ValueException("Given row key is not defined")
-			self.column_definitions[key]['sortable'] = False
-		#
-	#
+        for key in args:
+            if (key not in self.column_definitions): raise ValueException("Given row key is not defined")
+            self.column_definitions[key]['sortable'] = False
+        #
+    #
 
-	def get_column_definitions(self):
-	#
-		"""
+    def get_column_definitions(self):
+        """
 Returns a dict of all column definitions.
 
 :return: (dict) Column definitions
 :since:  v0.2.00
-		"""
+        """
 
-		return self.column_definitions
-	#
+        return self.column_definitions
+    #
 
-	def get_columns(self):
-	#
-		"""
+    def get_columns(self):
+        """
 Returns a list of all column keys.
 
 :return: (list) Column keys
 :since:  v0.2.00
-		"""
+        """
 
-		return self.columns
-	#
+        return self.columns
+    #
 
-	def get_limit(self):
-	#
-		"""
+    def get_limit(self):
+        """
 Returns the limit of rows requested.
 
 :return: (int) Maximum number of rows requested; -1 for unlimited
 :since:  v0.2.00
-		"""
+        """
 
-		return self.limit
-	#
+        return self.limit
+    #
 
-	def get_percent_remaining(self):
-	#
-		"""
+    def get_percent_remaining(self):
+        """
 Returns the percent remaining to be at 100%.
 
 :return: (int) Percent value
 :since:  v0.2.00
-		"""
+        """
 
-		return self.percent_remaining
-	#
+        return self.percent_remaining
+    #
 
-	def get_row_count(self):
-	#
-		"""
+    def get_row_count(self):
+        """
 Returns the number of rows.
 
 :return: (int) Number of rows
 :since:  v0.2.00
-		"""
+        """
 
-		raise NotImplementedException()
-	#
+        raise NotImplementedException()
+    #
 
-	def _is_sort_key_known(self, key):
-	#
-		"""
+    def _is_sort_key_known(self, key):
+        """
 Checks if the given sort key is known.
 
 :param key: Key used internally
 
 :return: (bool) Returns true if the sort key is known
 :since:  v0.2.00
-		"""
+        """
 
-		return (key in self.column_definitions)
-	#
+        return (key in self.column_definitions)
+    #
 
-	def set_default_sort_definition(self, key, direction):
-	#
-		"""
+    def set_default_sort_definition(self, key, direction):
+        """
 Sets the default sort definition to be used.
 
 :param key: Row key to sort
 :param direction: Sort direction
 
 :since: v0.2.00
-		"""
+        """
 
-		if (not self._is_sort_key_known(key)): raise ValueException("Given sort key is not known")
-		if (direction not in ( Abstract.SORT_ASCENDING, Abstract.SORT_DESCENDING )): raise TypeException("Sort direction given is invalid")
+        if (not self._is_sort_key_known(key)): raise ValueException("Given sort key is not known")
+        if (direction not in ( Abstract.SORT_ASCENDING, Abstract.SORT_DESCENDING )): raise TypeException("Sort direction given is invalid")
 
-		self.default_sort_definition = { "key": self.column_definitions[key]['sort_key'],
-		                                 "direction": direction
-		                               }
-	#
+        self.default_sort_definition = { "key": self.column_definitions[key]['sort_key'],
+                                         "direction": direction
+                                       }
+    #
 
-	def set_limit(self, limit):
-	#
-		"""
+    def set_limit(self, limit):
+        """
 Sets the limit of rows requested.
 
 :param limit: Maximum number of rows requested; -1 for unlimited
 
 :since: v0.2.00
-		"""
+        """
 
-		self.limit = limit
-	#
+        self.limit = limit
+    #
 
-	def set_offset(self, offset):
-	#
-		"""
+    def set_offset(self, offset):
+        """
 Sets the row offset requested.
 
 :param offset: Row offset requested
 
 :since: v0.2.00
-		"""
+        """
 
-		self.offset = offset
-	#
+        self.offset = offset
+    #
 
-	def set_sort_context(self, context):
-	#
-		"""
+    def set_sort_context(self, context):
+        """
 Sets the sort context to be used.
 
 :param context: Sort context
 
 :since: v0.2.00
-		"""
+        """
 
-		self.sort_context = context
-	#
+        self.sort_context = context
+    #
 #
-
-##j## EOF

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -18,14 +17,11 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 #echo(__FILEPATH__)#
 """
 
-from dNG.runtime.value_exception import ValueException
-
 from .abstract import Abstract as _Abstract
 from .custom_row import CustomRow
 
 class Custom(_Abstract):
-#
-	"""
+    """
 "Custom" defines a table based on manually defined rows.
 
 :author:     direct Netware Group et al.
@@ -35,76 +31,69 @@ class Custom(_Abstract):
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def __init__(self):
-	#
-		"""
+    def __init__(self):
+        """
 Constructor __init__(Custom)
 
 :since: v0.2.00
-		"""
+        """
 
-		_Abstract.__init__(self)
+        _Abstract.__init__(self)
 
-		self.row_count = None
-		"""
+        self.row_count = None
+        """
 Manual set row count
-		"""
-		self.rows = [ ]
-		"""
+        """
+        self.rows = [ ]
+        """
 List of rows
-		"""
-	#
+        """
+    #
 
-	def __iter__(self):
-	#
-		"""
+    def __iter__(self):
+        """
 python.org: Return an iterator object.
 
 :return: (object) Iterator object
 :since:  v0.2.00
-		"""
+        """
 
-		return iter(self.rows)
-	#
+        return iter(self.rows)
+    #
 
-	def add_row(self, **kwargs):
-	#
-		"""
+    def add_row(self, **kwargs):
+        """
 Adds row data to this table.
 
 :since: v0.2.00
-		"""
+        """
 
-		self.rows.append(CustomRow(kwargs))
-	#
+        self.rows.append(CustomRow(kwargs))
+    #
 
-	def get_row_count(self):
-	#
-		"""
+    def get_row_count(self):
+        """
 Returns the number of rows.
 
 :return: (int) Number of rows
 :since:  v0.2.00
-		"""
+        """
 
-		if (self.row_count is None): self.row_count = len(self.rows)
-		return self.row_count
-	#
+        if (self.row_count is None): self.row_count = len(self.rows)
+        return self.row_count
+    #
 
-	def set_row_count(self, row_count):
-	#
-		"""
+    def set_row_count(self, row_count):
+        """
 Sets the row count.
 
 :param row_count: Number of rows
 
 :since: v0.2.00
-		"""
+        """
 
-		self.row_count = row_count
-	#
+        self.row_count = row_count
+    #
 #
-
-##j## EOF

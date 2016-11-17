@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -19,8 +18,7 @@ https://www.direct-netware.de/redirect?licenses;mpl2
 """
 
 class SourceCallbacksMixin(object):
-#
-	"""
+    """
 "SourceCallbacksMixin" provides methods to receive the rows from an external
 source with registered callbacks.
 
@@ -31,29 +29,27 @@ source with registered callbacks.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	def __init__(self):
-	#
-		"""
+    def __init__(self):
+        """
 Constructor __init__(SourceCallbacksMixin)
 
 :since: v0.2.00
-		"""
+        """
 
-		self.source_row_count_callback = None
-		"""
+        self.source_row_count_callback = None
+        """
 Callback to receive the total number of rows available.
-		"""
-		self.source_rows_callback = None
-		"""
+        """
+        self.source_rows_callback = None
+        """
 Callback to receive the iterator source from.
-		"""
-	#
+        """
+    #
 
-	def set_source_callbacks(self, rows_callback, row_count_callback):
-	#
-		"""
+    def set_source_callbacks(self, rows_callback, row_count_callback):
+        """
 Sets the callbacks to receive the iterator source from.
 
 :param rows_callback: It is called with "offset" and "limit" arguments to
@@ -62,11 +58,9 @@ Sets the callbacks to receive the iterator source from.
                            of rows available.
 
 :since: v0.2.00
-		"""
+        """
 
-		self.source_rows_callback = rows_callback
-		self.source_row_count_callback = row_count_callback
-	#
+        self.source_rows_callback = rows_callback
+        self.source_row_count_callback = row_count_callback
+    #
 #
-
-##j## EOF

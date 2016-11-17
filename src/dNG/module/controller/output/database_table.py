@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##j## BOF
 
 """
 direct PAS
@@ -23,8 +22,7 @@ from dNG.database.connection import Connection
 from .table import Table
 
 class DatabaseTable(Table):
-#
-	"""
+    """
 The "DatabaseTable" is used to render a table of rows of columns from the
 database.
 
@@ -35,19 +33,16 @@ database.
 :since:      v0.2.00
 :license:    https://www.direct-netware.de/redirect?licenses;mpl2
              Mozilla Public License, v. 2.0
-	"""
+    """
 
-	@Connection.wrap_callable
-	def execute_render(self):
-	#
-		"""
+    @Connection.wrap_callable
+    def execute_render(self):
+        """
 Action for "render"
 
 :since: v0.2.00
-		"""
+        """
 
-		Table.execute_render(self)
-	#
+        Table.execute_render(self)
+    #
 #
-
-##j## EOF
